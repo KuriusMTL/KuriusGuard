@@ -40,7 +40,7 @@ async def send_captcha(user):
         bytes, answer = generate_captcha()
         img_file = discord.File(bytes, filename="captcha.png")
         emoji = discord.utils.get(client.emojis, name='sus')
-        embed = discord.Embed(title=f"Oups. Something is sus {str(emoji)}.", description="Hello, we've noticied some anomalies with your account. There is no need to worry. A simple captcha will help us verify your identity. Please respond with the hidden text inside the following image.", color=0xFF0000)
+        embed = discord.Embed(title=f"Oups. Your profile is sus like SussyRissy {str(emoji)}.", description="Hello, we've noticied some anomalies with your account. There is no need to worry. A simple captcha will help us verify your identity. Please respond with the hidden text inside the following image unless if you are truly sus like SussyRissy.", color=0xFF0000)
         embed.set_image(url='attachment://captcha.png')
         await user.send(file=img_file, embed=embed)
         return answer
