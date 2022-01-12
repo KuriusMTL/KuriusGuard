@@ -17,6 +17,8 @@ captcha_list = {} # ID, {captcha answer, tries}
 
 verified_role = "Verified User"
 
+command_channel = 904198381734330378
+
 @client.event
 async def on_ready():
     print(f'{client.user} is up and running.')
@@ -45,6 +47,23 @@ async def on_message(message):
         await message.channel.send(f"Incorrect answer. You have {tries} more tries left. Here is a new captcha.")
         await send_captcha(message.author, tries) # Send new captcha and decrement tries
         return
+    
+    if "Community Manager" in message.author.roles:
+        if message.channel.id == command_channel:
+            # Give everyone the verified role
+            # Should only be used when initializing the bot
+            if message.content == "!verifyall":
+                for user in message.guild.members:
+                    user.add_roles(discord.utils.get(message.guild.roles, name=verified_role))
+                return
+            
+            # Flag user manually by ID
+            # Syntax: !flag <user ID>
+            if message.content.split()[0] == "!flag":
+                user = await client.fetch_user(message.content.split()[1])
+                await send_captcha(user)
+                return
+
 
 
 @client.event
@@ -92,6 +111,10 @@ async def on_member_join(member):
 
 # Send the captcha to user and returns the answer to the captcha
 async def send_captcha(user, tries = max_tries):
+    # Remove verified role if user has it
+    if verified_role in user.roles:
+        await user.remove_roles(discord.utils.get(user.guild.roles, name=verified_role))
+
     bytes, answer = generate_captcha()
     img_file = discord.File(bytes, filename="captcha.png")
     emoji = discord.utils.get(client.emojis, name='sus')
