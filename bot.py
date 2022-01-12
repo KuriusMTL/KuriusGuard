@@ -2,6 +2,7 @@ import discord
 from multicolorcaptcha import CaptchaGenerator
 from io import BytesIO
 from datetime import datetime
+import re
 
 TOKEN = ''
 CAPCTHA_SIZE_NUM = 2
@@ -48,8 +49,10 @@ async def on_message(message):
         await send_captcha(message.author, tries) # Send new captcha and decrement tries
         return
     
-    if "Community Manager" in message.author.roles:
+    # Check if the user has authority to execute the following commands
+    if "Community Manager" in [role.name for role in message.author.roles]:
         if message.channel.id == command_channel:
+
             # Give everyone the verified role
             # Should only be used when initializing the bot
             if message.content == "!verifyall":
@@ -60,9 +63,23 @@ async def on_message(message):
             # Flag user manually by ID
             # Syntax: !flag <user ID>
             if message.content.split()[0] == "!flag":
-                user = await client.fetch_user(message.content.split()[1])
-                await send_captcha(user)
-                return
+                try:
+                    # Get the user bu ID
+                    user = await client.fetch_user(message.content.split()[1])
+
+                    # Remove previous verified role if user has it
+                    try:
+                        await user.remove_roles(discord.utils.get(user.guild.roles, name=verified_role))
+                    except:
+                        pass
+
+                    # Send captcha to user
+                    await send_captcha(user)
+                    return
+
+                except:
+                    await message.channel.send("Invalid user ID.")
+                    return
 
 
 
@@ -74,24 +91,27 @@ async def on_member_join(member):
     if len(watch_list) > watch_list_length:
         watch_list.pop(0)
 
+    # Logic to determine if user is sus
+
+    # Check if the user is in the blacklist
     with open("blacklist.txt", "r") as f:
         blacklist = f.readlines()
         if member.name in blacklist:
             await send_captcha(member)
             return
-
-    # Logic to determine if user is sus
     
+    # Check if user joined within 30 seconds of previous user
     if len(watch_list) > 1:
-
-        # Check if user joined within 30 seconds of previous user
         if watch_list[-1]["joined_at"] - watch_list[-2]["joined_at"] < datetime.timedelta(seconds=30):
             await send_captcha(member) # Send captcha to user
             # if previous user hasn't been flagged, flag them and send captcha to them too
             if watch_list[-2]["id"] not in captcha_list.keys():
                 try:
                     previous_user = await client.fetch_user(watch_list[-2]["id"])
-                    await previous_user.remove_roles(discord.utils.get(member.guild.roles, name=verified_role))
+                    try:
+                        await previous_user.remove_roles(discord.utils.get(member.guild.roles, name=verified_role))
+                    except:
+                        pass
                     await send_captcha(previous_user)
                 except discord.NotFound:
                     print("Previous user not found")
@@ -99,13 +119,21 @@ async def on_member_join(member):
                     print("Error trying to flag previous user")
             return
     
+    # Check to see if the user's account is at least a week old
+    if datetime.now() - member.created_at < datetime.timedelta(days=7):
+        await send_captcha(member)
+        return
+
+    # Check to see if the user matches a known pattern
+    with open("patterns.txt", "r") as f:
+        patterns = f.readlines()
+        for pattern in patterns:
+            if bool(re.match(pattern, member.name)):
+                await send_captcha(member)
+                return
 
     member.add_roles(discord.utils.get(member.guild.roles, name=verified_role)) # Give verified role to user
 
-    # Check if a user is similar to a watch list user (compare similarity in names and discriminators)
-    # We can either use predifined username parser or some sklearn algorithm 
-    # If yes, send a captcha to the user
-    # Send a captcha to the user and quarantine user.
 
     print(f'{member} has joined the server.')
 
