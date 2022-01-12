@@ -85,6 +85,7 @@ async def on_message(message):
 
 @client.event
 async def on_member_join(member):
+    print(f'{member} has joined the server.')
     watch_list.append({member.name, member.id, member.joined_at}) # Add member to watch list
 
     # Keep the watch list length smaller than watch_list_length
@@ -131,11 +132,14 @@ async def on_member_join(member):
             if bool(re.match(pattern, member.name)):
                 await send_captcha(member)
                 return
+    
+    # Check if the user has a profile pic or a status
+    if member.avatar_url == member.default_avatar_url and member.activity == None:
+        await send_captcha(member)
+        return
 
     member.add_roles(discord.utils.get(member.guild.roles, name=verified_role)) # Give verified role to user
 
-
-    print(f'{member} has joined the server.')
 
 # Send the captcha to user and returns the answer to the captcha
 async def send_captcha(user, tries = max_tries):
