@@ -4,7 +4,7 @@ from io import BytesIO
 from datetime import datetime, timedelta
 import re
 
-TOKEN = 'OTIyNzAyMjMyODAwMDg4MDc0.YcFTaw.oGXG_kgQtj5sTt4A0FQW0RpTFZ8'
+TOKEN = 'OTIyNzAyMjMyODAwMDg4MDc0.YcFTaw.vBjKpJ32efB1R9ouUDkuA7D8ASw'
 CAPCTHA_SIZE_NUM = 1
 
 client = discord.Client(intents=discord.Intents.all())
@@ -18,8 +18,10 @@ captcha_list = {} # ID, {captcha answer, tries}
 
 verified_role = "Verified User"
 
-command_channel = 822627889739989026
-server_id = 822627889739989023
+command_channel = 904198381734330378
+server_id = 692133317520261120
+
+stop_flagging = False
 
 @client.event
 async def on_ready():
@@ -60,8 +62,19 @@ async def on_message(message):
             # Give everyone the verified role
             # Should only be used when initializing the bot
             if message.content == "!verifyall":
+                print(len(message.guild.members))
                 for user in message.guild.members:
+                    print("Gave role to " + user.name)
                     await user.add_roles(discord.utils.get(message.guild.roles, name=verified_role))
+                print("Gave role to everyone.")
+                return
+
+            # Give Verified User role from ID
+            if message.content.split(" ")[0] == "!verify":
+                user_id = int(message.content.split(" ")[1])
+                user = get_user_from_server(user_id)
+                await user.add_roles(discord.utils.get(message.guild.roles, name=verified_role))
+                captcha_list.pop(user_id)
                 return
             
             # Flag user manually by ID
@@ -85,10 +98,22 @@ async def on_message(message):
                     await message.channel.send("Invalid user ID.")
                     return
 
+            # Stop flagging users <!ignore enable/disable>
+            if message.content.split(" ")[0] == "!ignore":
+                if message.content.split(" ")[1] == "enable":
+                    stop_flagging = True
+                elif message.content.split(" ")[1] == "disable":
+                    stop_flagging = False
+                return
+
 
 
 @client.event
 async def on_member_join(member):
+    if stop_flagging:
+        await member.add_roles(discord.utils.get(member.guild.roles, name=verified_role)) # Give verified role to user
+        return
+
     print(f'{member} has joined the server.')
     watch_list.append({"name": member.name, "id": member.id, "joined_at": member.joined_at}) # Add member to watch list
 
