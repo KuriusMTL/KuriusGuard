@@ -4,7 +4,7 @@ from io import BytesIO
 from datetime import datetime, timedelta
 import re
 
-TOKEN = 'OTIyNzAyMjMyODAwMDg4MDc0.YcFTaw.vBjKpJ32efB1R9ouUDkuA7D8ASw'
+TOKEN = ''
 CAPCTHA_SIZE_NUM = 1
 
 client = discord.Client(intents=discord.Intents.all())
