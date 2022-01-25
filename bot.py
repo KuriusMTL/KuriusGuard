@@ -20,12 +20,13 @@ verified_role = "Verified User"
 
 command_channel = 904198381734330378
 server_id = 692133317520261120
+console_channel = 935607969704443946
 
 stop_flagging = False
 
 @client.event
 async def on_ready():
-    print(f'{client.user} is up and running.')
+    await print_to_console(f'{client.user} is up and running.')
 
 @client.event
 async def on_message(message):
@@ -48,6 +49,7 @@ async def on_message(message):
 
         if tries <= 0: # User has failed to respond to captcha too many times
             await message.channel.send("You have exceeded the maximum number of tries. Please contact one of our Community Managers (NextLight#1378 or Fred#5920).")
+            await print_to_console(f'{message.author.name} has failed the captcha {max_tries} times.')
             return
         
         tries -= 1
@@ -62,11 +64,9 @@ async def on_message(message):
             # Give everyone the verified role
             # Should only be used when initializing the bot
             if message.content == "!verifyall":
-                print(len(message.guild.members))
                 for user in message.guild.members:
-                    print("Gave role to " + user.name)
                     await user.add_roles(discord.utils.get(message.guild.roles, name=verified_role))
-                print("Gave role to everyone.")
+                await print_to_console("Gave verified role to all members of the server.")
                 return
 
             # Give Verified User role from ID
@@ -102,19 +102,22 @@ async def on_message(message):
             if message.content.split(" ")[0] == "!ignore":
                 if message.content.split(" ")[1] == "enable":
                     stop_flagging = True
+                    await print_to_console(f"Stopped flagging users.")
                 elif message.content.split(" ")[1] == "disable":
                     stop_flagging = False
+                    await print_to_console(f"Started flagging users again.")
                 return
 
 
 
 @client.event
 async def on_member_join(member):
+    await print_to_console(f'{member.name} has joined the server.')
     if stop_flagging:
+        await print_to_console("Flagging is currently disabled. `!ignore disable` to start flagging again.")
         await member.add_roles(discord.utils.get(member.guild.roles, name=verified_role)) # Give verified role to user
         return
 
-    print(f'{member} has joined the server.')
     watch_list.append({"name": member.name, "id": member.id, "joined_at": member.joined_at}) # Add member to watch list
 
     # Keep the watch list length smaller than watch_list_length
@@ -127,14 +130,14 @@ async def on_member_join(member):
     with open("blacklist.txt", "r") as f:
         blacklist = f.readlines()
         if member.name in blacklist:
-            print("Flagged by blacklist")
+            await print_to_console(f"{member.name} was flagged by blacklist")
             await send_captcha(member)
             return
     
     # Check if user joined within 30 seconds of previous user
     if len(watch_list) > 1:
         if watch_list[-1]["joined_at"] - watch_list[-2]["joined_at"] < timedelta(seconds=30):
-            print("Flagged by joined within 30 seconds")
+            await print_to_console(f"{member.name} was flagged by joining within 30 seconds")
             await send_captcha(member) # Send captcha to user
             # if previous user hasn't been flagged, flag them and send captcha to them too
             if watch_list[-2]["id"] not in captcha_list.keys():
@@ -142,18 +145,19 @@ async def on_member_join(member):
                     previous_user = get_user_from_server(watch_list[-2]["id"])
                     try:
                         await previous_user.remove_roles(discord.utils.get(member.guild.roles, name=verified_role))
+                        await print_to_console(f"{previous_user.name} was flagged, another user joined within 30 seconds.")
                     except Exception as e:
-                        print(e)
+                        await print_to_console(f"Error: {e} - While trying to flag previous user.")
                     await send_captcha(previous_user)
                 except discord.NotFound:
-                    print("Previous user not found")
-                except:
-                    print("Error trying to flag previous user")
+                    await print_to_console("Previous user not found in the server.")
+                except Exception as e:
+                    await print_to_console("Error {e} - While trying to flag previous user")
             return
     
     # Check to see if the user's account is at least a week old
     if datetime.now() - member.created_at < timedelta(days=7):
-        print("Flagged by ageism")
+        await print_to_console(f"{member.name} was flagged because account is less than a week old.")
         await send_captcha(member)
         return
 
@@ -162,21 +166,23 @@ async def on_member_join(member):
         patterns = f.readlines()
         for pattern in patterns:
             if bool(re.match(pattern, member.name)):
-                print("Flagged by patterns")
+                await print_to_console(f"{member.name} was flagged by pattern.")
                 await send_captcha(member)
                 return
     
     # Check if the user has a profile pic or a status
     if member.avatar_url == member.default_avatar_url and member.activity == None:
-        print("Flagged by no profile pic and no status")
+        await print_to_console(f"{member.name} was flagged by no profile pic and no status.")
         await send_captcha(member)
         return
 
+    await print_to_console(f'{member.name} passed all checks and is verified.')
     await member.add_roles(discord.utils.get(member.guild.roles, name=verified_role)) # Give verified role to user
 
 
 # Send the captcha to user and returns the answer to the captcha
 async def send_captcha(user, tries = max_tries):
+    await print_to_console(f"Sending captcha to {user.name}. Tries left: {max_tries - tries}")
     # Remove verified role if user has it
     if hasattr(user, 'roles') and (verified_role in user.roles):
         await user.remove_roles(discord.utils.get(user.guild.roles, name=verified_role))
@@ -215,7 +221,13 @@ def get_user_from_server(user_id):
         return user
     except:
         return None
-    
+
+async def print_to_console(message):
+    server = client.get_guild(server_id)
+    channel = server.get_channel(console_channel)
+    await channel.send(message)
+    return
+
 
 if __name__ == '__main__':
     client.run(TOKEN)
