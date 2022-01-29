@@ -113,6 +113,8 @@ async def on_message(message):
 
 @client.event
 async def on_member_join(member):
+    if member.guild.id != server_id: return # User joined in another server the bot is in
+
     await print_to_console(f'{member.name} has joined the server.')
     if stop_flagging:
         await print_to_console("Flagging is currently disabled. `!ignore disable` to start flagging again.")
