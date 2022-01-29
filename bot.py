@@ -37,6 +37,7 @@ async def on_message(message):
             return
 
         if message.content == captcha_list[message.author.id]["answer"]: # Correct answer to captcha
+            await print_to_console(f"{message.author.name} got the captcha right and is now verified.")
             await message.channel.send("You are now verified and can access the server.")
             captcha_list.pop(message.author.id)
 
@@ -182,7 +183,7 @@ async def on_member_join(member):
 
 # Send the captcha to user and returns the answer to the captcha
 async def send_captcha(user, tries = max_tries):
-    await print_to_console(f"Sending captcha to {user.name}. Tries left: {max_tries - tries}")
+    await print_to_console(f"Sending captcha to {user.name}. Tries: {max_tries - tries}/{max_tries}")
     # Remove verified role if user has it
     if hasattr(user, 'roles') and (verified_role in user.roles):
         await user.remove_roles(discord.utils.get(user.guild.roles, name=verified_role))
