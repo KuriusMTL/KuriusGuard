@@ -10,6 +10,8 @@ CAPCTHA_SIZE_NUM = 1
 client = discord.Client(intents=discord.Intents.all())
 captcha = CaptchaGenerator(CAPCTHA_SIZE_NUM)
 
+command_roles = ["Kurius Executive", "Ambassador"] # Roles that can use commands
+
 watch_list_length = 10
 watch_list = [] # Name, date joined, ID
 
@@ -59,7 +61,7 @@ async def on_message(message):
         return
     
     # Check if the user has authority to execute the following commands
-    if "Community Manager" in [role.name for role in message.author.roles]:
+    if [role.name for role in message.author.roles if role.name in command_roles] != []:
         if message.channel.id == command_channel:
 
             # Give everyone the verified role
