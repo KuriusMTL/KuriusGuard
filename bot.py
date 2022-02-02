@@ -78,6 +78,7 @@ async def on_message(message):
                 user = get_user_from_server(user_id)
                 await user.add_roles(discord.utils.get(message.guild.roles, name=verified_role))
                 captcha_list.pop(user_id)
+                await print_to_console(f"Gave verified role to {user.name}.")
                 return
             
             # Flag user manually by ID
@@ -95,10 +96,11 @@ async def on_message(message):
 
                     # Send captcha to user
                     await send_captcha(user)
+                    await print_to_console(f"Sent captcha to {user.name}.")
                     return
 
                 except:
-                    await message.channel.send("Invalid user ID.")
+                    await print_to_console("Invalid user ID.")
                     return
 
             # Stop flagging users <!ignore enable/disable>
