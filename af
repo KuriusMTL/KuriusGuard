@@ -1,0 +1,83 @@
+[33mcommit 71f4eea45eef522c77d24591c60d9487bb5131b2[m[33m ([m[1;36mHEAD -> [m[1;32mmaster[m[33m)[m
+Author: Frederic Jarjour <fredj.happy@gmail.com>
+Date:   Tue Feb 1 22:07:19 2022 -0500
+
+    added console logs to commands
+
+[33mcommit a16156621fa21f03f2c1c76dc374f6bbc4d920fd[m
+Author: Frederic Jarjour <fredj.happy@gmail.com>
+Date:   Tue Feb 1 21:46:15 2022 -0500
+
+    added support for mod roles
+
+[33mcommit 04197cdec80d979fce8653226a9e5c93335a448f[m
+Author: Frederic Jarjour <frederic.jarjour@umontreal.ca>
+Date:   Sat Jan 29 13:26:32 2022 -0500
+
+    added server check in on member join
+
+[33mcommit 375d40d23042e2aa217dc82ef2d418cfa0cccf1c[m
+Author: Frederic Jarjour <frederic.jarjour@umontreal.ca>
+Date:   Sat Jan 29 13:23:22 2022 -0500
+
+    added console log when user solves a captcha and fixed inverted tries message when logging sending a captcha
+
+[33mcommit 9aa8b9da370f8ff96c832d031d139ce57c64d680[m
+Author: Frederic Jarjour <frederic.jarjour@umontreal.ca>
+Date:   Tue Jan 25 14:08:14 2022 -0500
+
+    added a console to view output from bot
+
+[33mcommit 7cf002664a82594d3df6aa492b63eea20222450c[m
+Author: Frederic Jarjour <fredj.happy@gmail.com>
+Date:   Sun Jan 23 22:34:10 2022 -0500
+
+    uploaded without token updated whole bot
+
+[33mcommit f3877028e40dc959beb1c5fb6ccd748b0d662edb[m
+Author: Frederic Jarjour <fredj.happy@gmail.com>
+Date:   Sun Jan 23 22:33:31 2022 -0500
+
+    updated the whole bot
+
+[33mcommit af8ee952533ed5a806718700e9ea568cbc427e12[m[33m ([m[1;31morigin/master[m[33m, [m[1;31morigin/HEAD[m[33m)[m
+Author: Eduard Anton <eduard.anton2002@gmail.com>
+Date:   Thu Jan 20 21:15:55 2022 -0500
+
+    testing and bug fixed
+
+[33mcommit 588f3ef2a48b62af269eb1fa7429cbdc342f54fb[m
+Author: Frederic Jarjour <frederic.jarjour@umontreal.ca>
+Date:   Wed Jan 12 11:36:14 2022 -0500
+
+    added check for profile pic or status
+
+[33mcommit 4f6020de42540af111ea703095aafcea19cc47af[m
+Author: Eduard Anton <eduard.anton2002@gmail.com>
+Date:   Wed Jan 12 11:18:03 2022 -0500
+
+    Added created_at check & pattern check
+
+[33mcommit 55f76963019aa72cd788fa235554c44aa475eb82[m
+Author: Frederic Jarjour <frederic.jarjour@umontreal.ca>
+Date:   Wed Jan 12 09:45:57 2022 -0500
+
+    added verifyall and command to manually flag user
+
+[33mcommit 97f603770d05c3071304f8337b7c078b7bfa6d3e[m
+Author: Frederic Jarjour <frederic.jarjour@umontreal.ca>
+Date:   Tue Jan 11 22:12:52 2022 -0500
+
+    added time verification and implemented captchas
+
+[33mcommit 93aa077c6484a8a2e6e0922bd4ec55200b4eb7de[m
+Author: Andrew059 <71473456+Andrew059@users.noreply.github.com>
+Date:   Tue Jan 11 15:55:42 2022 -0500
+
+    Update bot.py
+
+[33mcommit a21122ae16dedbe3a1ecaa95fae8d55e02723dfd[m
+Author: Eduard Anton <eduard.anton2002@gmail.com>
+Date:   Tue Jan 11 13:18:50 2022 -0500
+
+    first commit
